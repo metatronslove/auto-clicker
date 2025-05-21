@@ -74,7 +74,7 @@ Bu yöntem, Conda'nın güçlü paket yönetimi sayesinde `pygobject` ve `gtk3` 
     python3 autoclick.py
     ```
     Uygulama başarıyla başlamalı ve GUI görünmelidir.
-    ![Otomatik Tıklayıcı (AutoClicker)](https://github.com/metatronslove/auto-clicker/blob/Ekran_Görüntüsü_20250521_130718.png)
+    ![Otomatik Tıklayıcı (AutoClicker)](https://github.com/metatronslove/auto-clicker/blob/5ca305faf627fe4f0a6bac74ad2769a4315d72f9/Ekran_G%C3%B6r%C3%BCnt%C3%BCs%C3%BC_20250521_130718.png)
 
 ### Alternatif Kurulum (Pip)
 
