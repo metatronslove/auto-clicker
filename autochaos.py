@@ -80,21 +80,16 @@ class AutoClickerGtkApp(Gtk.Application):
 					self.color_delay = settings.get('color_delay_ms', default_settings['color_delay_ms']) / 1000.0
 					colors = settings.get('selected_colors', default_settings['selected_colors'])
 					self.selected_colors = [tuple(color) for color in colors if isinstance(color, list) and len(color) == 3]
-					print(f"Loaded settings: {settings}")
-					print(f"click_interval: {self.click_interval}s, color_delay: {self.color_delay}s")
 			else:
-				print("No autoclick.json found, using defaults")
 				self.click_interval = default_settings['click_interval_ms'] / 1000.0
 				self.total_clicks = default_settings['total_clicks']
 				self.color_detection_enabled = default_settings['color_detection_enabled']
 				self.color_delay = default_settings['color_delay_ms'] / 1000.0
 				self.selected_colors = default_settings['selected_colors']
 				self.save_settings()
-		except json.JSONDecodeError as e:
-			print(f"Error decoding autoclick.json: {e}")
+		except json.JSONDecodeError:
 			self.apply_default_settings(default_settings)
-		except Exception as e:
-			print(f"Error loading settings: {e}")
+		except Exception:
 			self.apply_default_settings(default_settings)
 
 	def apply_default_settings(self, default_settings):
@@ -118,9 +113,8 @@ class AutoClickerGtkApp(Gtk.Application):
 		try:
 			with open('autoclick.json', 'w') as f:
 				json.dump(settings, f, indent=4)
-			print(f"Saved settings: {settings}")
-		except Exception as e:
-			print(f"Error saving settings: {e}")
+		except Exception:
+			pass
 
 	def start_keyboard_listener(self):
 		"""Start pynput keyboard listener for Ctrl+Esc."""
@@ -394,16 +388,13 @@ class AutoClickerGtkApp(Gtk.Application):
 				x, y = int(x), int(y)
 				if 0 <= x < screen_width and 0 <= y < screen_height:
 					color = pyautogui.pixel(x, y)
-					print(f"Color picked at ({x}, {y}): RGB({color[0]}, {color[1]}, {color[2]})")
 					if color not in self.selected_colors:
 						self.selected_colors.append(color)
 						self.update_colors_label()
 						self.save_settings()
 				else:
-					print(f"Coordinates out of bounds: ({x}, {y})")
 					GLib.idle_add(self.show_color_pick_error, "Tıklama ekran sınırları dışında!")
 			except Exception as e:
-				print(f"Error picking color: {e}")
 				GLib.idle_add(self.show_color_pick_error, f"Renk seçme hatası: {str(e)}")
 			finally:
 				self.waiting_for_color_pick = False
@@ -525,9 +516,9 @@ class AutoClickerGtkApp(Gtk.Application):
 		self.update_progress_gui_update()
 
 	def auto_click(self):
-		def is_color_similar(pixel, selected_color, tolerance=5):
+		def is_color_similar(pixel, selected_color, tolerance=0):
 			"""Check if pixel is within tolerance of selected_color."""
-			return all(abs(pixel[i] - selected_color[i]) <= tolerance for i in range(3))
+			return all(pixel[i] == selected_color[i] for i in range(3))
 
 		while self.clicking:
 			if self.total_clicks > 0 and self.click_count >= self.total_clicks:
@@ -537,43 +528,28 @@ class AutoClickerGtkApp(Gtk.Application):
 
 			if self.click_position:
 				is_color_match = False
-				current_interval = self.click_interval
-				print(f"Initial: click_interval={self.click_interval}s, color_delay={self.color_delay}s")
-				print(f"Selected colors: {self.selected_colors}")
+				wait_interval = self.click_interval
 				if self.color_detection_enabled and self.selected_colors:
 					try:
 						pixel = pyautogui.pixel(self.click_position[0], self.click_position[1])
-						print(f"Checked color at ({self.click_position[0]}, {self.click_position[1]}): RGB{pixel}")
 						for color in self.selected_colors:
 							if is_color_similar(pixel, color):
 								is_color_match = True
-								current_interval = self.color_delay
-								print(f"Color match with {color}, using color_delay: {self.color_delay}s")
+								wait_interval = self.color_delay
 								break
-							else:
-								print(f"No match with {color}, diff: {[abs(pixel[i] - color[i]) for i in range(3)]}")
-						if not is_color_match:
-							current_interval = self.click_interval
-							print(f"No color match, using click_interval: {self.click_interval}s")
-					except Exception as e:
-						print(f"Error getting pixel color: {e}")
-						current_interval = self.click_interval
-						print(f"Error case, using click_interval: {self.click_interval}s")
-				else:
-					print(f"Color detection disabled or no selected colors, using click_interval: {self.click_interval}s")
+					except Exception:
+						wait_interval = self.click_interval
 
-				# Wait for the determined interval BEFORE clicking
-				print(f"Waiting for {current_interval}s")
-				time.sleep(current_interval)
+				time.sleep(wait_interval)
 
-				# Perform the click
-				pyautogui.click(self.click_position[0], self.click_position[1])
-				if is_color_match:
-					print(f"Performed color delay click (not counted)")
-				else:
-					self.click_count += 1
-					print(f"Performed regular click (counted: {self.click_count})")
-					GLib.idle_add(self.update_progress_gui_update)
+				try:
+					pyautogui.click(self.click_position[0], self.click_position[1])
+					if not is_color_match:
+						self.click_count += 1
+				except Exception:
+					continue
+
+				GLib.idle_add(self.update_progress_gui_update)
 
 	def update_progress_gui_update(self):
 		if self.total_clicks > 0:
