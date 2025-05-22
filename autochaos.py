@@ -524,56 +524,56 @@ class AutoClickerGtkApp(Gtk.Application):
 
 		self.update_progress_gui_update()
 
-def auto_click(self):
-	def is_color_similar(pixel, selected_color, tolerance=5):
-		"""Check if pixel is within tolerance of selected_color."""
-		return all(abs(pixel[i] - selected_color[i]) <= tolerance for i in range(3))
+	def auto_click(self):
+		def is_color_similar(pixel, selected_color, tolerance=5):
+			"""Check if pixel is within tolerance of selected_color."""
+			return all(abs(pixel[i] - selected_color[i]) <= tolerance for i in range(3))
 
-	while self.clicking:
-		if self.total_clicks > 0 and self.click_count >= self.total_clicks:
-			self.clicking = False
-			GLib.idle_add(self.stop_waiting)
-			break
+		while self.clicking:
+			if self.total_clicks > 0 and self.click_count >= self.total_clicks:
+				self.clicking = False
+				GLib.idle_add(self.stop_waiting)
+				break
 
-		if self.click_position:
-			is_color_match = False
-			current_interval = self.click_interval
-			print(f"Initial: click_interval={self.click_interval}s, color_delay={self.color_delay}s")
-			print(f"Selected colors: {self.selected_colors}")
-			if self.color_detection_enabled and self.selected_colors:
-				try:
-					pixel = pyautogui.pixel(self.click_position[0], self.click_position[1])
-					print(f"Checked color at ({self.click_position[0]}, {self.click_position[1]}): RGB{pixel}")
-					for color in self.selected_colors:
-						if is_color_similar(pixel, color):
-							is_color_match = True
-							current_interval = self.color_delay
-							print(f"Color match with {color}, using color_delay: {self.color_delay}s")
-							break
-						else:
-							print(f"No match with {color}, diff: {[abs(pixel[i] - color[i]) for i in range(3)]}")
-					if not is_color_match:
+			if self.click_position:
+				is_color_match = False
+				current_interval = self.click_interval
+				print(f"Initial: click_interval={self.click_interval}s, color_delay={self.color_delay}s")
+				print(f"Selected colors: {self.selected_colors}")
+				if self.color_detection_enabled and self.selected_colors:
+					try:
+						pixel = pyautogui.pixel(self.click_position[0], self.click_position[1])
+						print(f"Checked color at ({self.click_position[0]}, {self.click_position[1]}): RGB{pixel}")
+						for color in self.selected_colors:
+							if is_color_similar(pixel, color):
+								is_color_match = True
+								current_interval = self.color_delay
+								print(f"Color match with {color}, using color_delay: {self.color_delay}s")
+								break
+							else:
+								print(f"No match with {color}, diff: {[abs(pixel[i] - color[i]) for i in range(3)]}")
+						if not is_color_match:
+							current_interval = self.click_interval
+							print(f"No color match, using click_interval: {self.click_interval}s")
+					except Exception as e:
+						print(f"Error getting pixel color: {e}")
 						current_interval = self.click_interval
-						print(f"No color match, using click_interval: {self.click_interval}s")
-				except Exception as e:
-					print(f"Error getting pixel color: {e}")
-					current_interval = self.click_interval
-					print(f"Error case, using click_interval: {self.click_interval}s")
-			else:
-				print(f"Color detection disabled or no selected colors, using click_interval: {self.click_interval}s")
+						print(f"Error case, using click_interval: {self.click_interval}s")
+				else:
+					print(f"Color detection disabled or no selected colors, using click_interval: {self.click_interval}s")
 
-			# Wait for the determined interval BEFORE clicking
-			print(f"Waiting for {current_interval}s")
-			time.sleep(current_interval)
+				# Wait for the determined interval BEFORE clicking
+				print(f"Waiting for {current_interval}s")
+				time.sleep(current_interval)
 
-			# Perform the click
-			pyautogui.click(self.click_position[0], self.click_position[1])
-			if is_color_match:
-				print(f"Performed color delay click (not counted)")
-			else:
-				self.click_count += 1
-				print(f"Performed regular click (counted: {self.click_count})")
-			GLib.idle_add(self.update_progress_gui_update)
+				# Perform the click
+				pyautogui.click(self.click_position[0], self.click_position[1])
+				if is_color_match:
+					print(f"Performed color delay click (not counted)")
+				else:
+					self.click_count += 1
+					print(f"Performed regular click (counted: {self.click_count})")
+					GLib.idle_add(self.update_progress_gui_update)
 
 	def update_progress_gui_update(self):
 		if self.total_clicks > 0:
