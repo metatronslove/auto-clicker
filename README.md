@@ -1,4 +1,4 @@
-# Otomatik Tıklayıcı (AutoClicker)
+# Otomatik Tıklayıcı (AutoClicker) https://youtu.be/l0MLjCJRxPk?si=4ZR8W6LJNjWapxeJ Muhtaç olduğun kudret!
 
 ![AutoClicker GUI](https://via.placeholder.com/300x250?text=Otomatik+T%C4%B1klay%C4%B1c%C4%B1+GUI) **Otomatik Tıklayıcı**, KDE Linux ortamında fare tıklamalarını otomatikleştiren, kullanımı kolay bir Python uygulamasıdır. Haber sitelerindeki kutuplaşmış, sığ ve derinleşememiş trollerin yorum bölümlerinde kaos yaratmak için tasarlandı! 😈 "Çoklu Tıklamayı Aç" butonuna bas, fareyle bir konuma tıkla ve gerisini Otomatik Tıklayıcı halletsin! Tıklamalar, sistem genelinde istediğiniz yerde çalışır, tıklama aralığını ve sayısını özelleştirebilirsiniz. İlerleme çubuğu ile trolleri gerdikçe keyfini çıkarın!
 
