@@ -123,3 +123,11 @@ Eğer Conda kullanmak istemiyorsanız ve sisteminiz GTK3 bağımlılıklarını 
 ## Katkıda Bulunanlar
 -   **Fikir ve Prompt**: [metatronslove](https://github.com/metatronslove)
 -   **Geliştirme ve Conda Ortamı Kurulum Desteği**: Gemini (Google'dan bir AI)
+
+## ☕ Destek Olun / Support
+
+Projemi beğendiyseniz, bana bir kahve ısmarlayarak destek olabilirsiniz!
+
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://buymeacoffee.com/metatronslove)
+
+Teşekkürler! 🙏
